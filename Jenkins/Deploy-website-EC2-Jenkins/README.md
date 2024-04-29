@@ -131,6 +131,40 @@ newgrp docker
 
 sudo chmod 666 /var/run/docker.sock
 ```
+'It sounds like you want to ensure that the changes you've made to the permissions of the Docker daemon socket (/var/run/docker.sock) persist across system reboots. To do so, you can set up a systemd service unit to apply the necessary permissions automatically at boot time.
+
+Here's how you can create a systemd service for this purpose:
+
+Create a new systemd service unit file. You can name it something like docker-socket-permissions.service. You can create this file in the /etc/systemd/system/ directory:
+
+sudo nano /etc/systemd/system/docker-socket-permissions.service
+Add the following content to the file:
+
+[Unit]
+Description=Set Docker socket permissions
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/chmod 666 /var/run/docker.sock
+
+[Install]
+WantedBy=multi-user.target
+
+Save the file and exit the text editor.
+Reload systemd to pick up the changes:
+
+sudo systemctl daemon-reload
+
+Enable the service so that it starts automatically at boot:
+
+sudo systemctl enable docker-socket-permissions.service
+
+Start the service to apply the permissions immediately:
+
+sudo systemctl start docker-socket-permissions.service
+
+With this setup, the permissions on /var/run/docker.sock will be adjusted automatically every time the system boots, ensuring that your Docker setup remains consistent and functional.'
 
 Step 10: 
 
